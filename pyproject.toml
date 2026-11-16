@@ -1,7 +1,7 @@
 [project]
-name = "course-agent"
+name = "research-scout"
 version = "0.1.0"
-description = "课程与论文资料助手"
+description = "科研论文调研 Agent：检索、阅读并生成带引用的调研报告"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
