@@ -1,5 +1,5 @@
 import os
-
+from openai import OpenAI
 import psycopg
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
@@ -7,7 +7,8 @@ from pydantic import BaseModel
 
 load_dotenv()
 DATABASE_URL = os.environ["DATABASE_URL"]
-
+OPENAI_MODEL = os.environ["OPENAI_MODEL"]
+client = OpenAI()
 app = FastAPI()
 
 
@@ -47,3 +48,16 @@ def create_course(course: CourseCreate):
         raise HTTPException(status_code=409, detail="课程已存在")
 
     return {"id": row[0], "name": course.name, "teacher": course.teacher}
+
+
+class AskRequest(BaseModel):
+    question: str
+
+
+@app.post("/ask")
+def ask(req: AskRequest):
+    response = client.responses.create(
+        model=OPENAI_MODEL,
+        input=req.question,
+    )
+    return {"question": req.question, "answer": response.output_text}
