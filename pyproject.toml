@@ -7,4 +7,5 @@ requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]>=0.163.1",
     "psycopg[binary]>=3.3.9",
+    "python-dotenv>=1.2.4",
 ]

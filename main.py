@@ -1,7 +1,10 @@
+import os
 from fastapi import FastAPI, HTTPException
 import psycopg
+from dotenv import load_dotenv
 
-DATABASE_URL = "postgresql://course:course_dev_pw@localhost:5432/course_agent"
+load_dotenv()
+DATABASE_URL = os.environ["DATABASE_URL"]
 app=FastAPI()
 @app.get("/")
 def hello():
