@@ -5,6 +5,7 @@ description = "科研论文调研 Agent：检索、阅读并生成带引用的�
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "alembic>=1.20.1",
     "fastapi[standard]>=0.163.1",
     "openai>=3.51.0",
     "psycopg[binary]>=3.3.9",
