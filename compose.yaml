@@ -4,9 +4,9 @@ services:
   db:
     image: pgvector/pgvector:pg17
     environment:
-      POSTGRES_USER: course
+      POSTGRES_USER: scout
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: course_agent
+      POSTGRES_DB: research_scout
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
@@ -17,7 +17,7 @@ services:
     build: .
     env_file: .env
     environment:
-      DATABASE_URL: postgresql://course:${POSTGRES_PASSWORD}@db:5432/course_agent
+      DATABASE_URL: postgresql://scout:${POSTGRES_PASSWORD}@db:5432/research_scout
     ports:
       - "8000:8000"
     depends_on:
