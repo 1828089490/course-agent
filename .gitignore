@@ -9,3 +9,9 @@ wheels/
 # Virtual environments
 .venv
 .env
+
+.env.*
+!.env.example
+
+# 下载的论文 PDF（arXiv 全文不可再分发）
+data/
