@@ -24,10 +24,28 @@ def extract_pages(pdf_path: Path) -> list[str]:
     return [page.extract_text() or "" for page in reader.pages]
 
 
-def is_heading(line: str) -> bool:
+def heading_number(line: str) -> int | None:
+    # "3.2.1 xxx" -> 3；附录标题（"A xxx"）和无编号标题 -> None
+    match = re.match(r"^(\d{1,2})[.\s]", line)
+    return int(match.group(1)) if match else None
+
+
+def is_heading(line: str, last_number: int) -> bool:
     if line in UNNUMBERED_HEADINGS:
         return True
-    return HEADING_RE.match(line) is not None
+    if HEADING_RE.match(line) is None:
+        return False
+    # 图表刻度（如 "50 GB 512 GB"）里没有正常的英文单词
+    if re.search(r"[a-z]{3,}", line) is None:
+        return False
+    # 以连字符或逗号结尾，说明句子还没完，是正文而不是标题
+    if line.endswith(("-", ",")):
+        return False
+    # 章节编号不会跳跃：上一个是第 3 章，下一个只能还是第 3 章或者第 4 章
+    number = heading_number(line)
+    if number is not None and not (last_number <= number <= last_number + 1):
+        return False
+    return True
 
 
 def join_lines(lines: list[str]) -> str:
@@ -45,18 +63,22 @@ def join_lines(lines: list[str]) -> str:
 def extract_segments(pdf_path: Path) -> list[Segment]:
     segments = []
     section = None
+    last_number = 0  # 最近一个有编号标题的章号
     for page_number, page_text in enumerate(extract_pages(pdf_path), start=1):
         lines = []
         for raw_line in page_text.split("\n"):
             line = raw_line.strip()
             if not line:
                 continue
-            if is_heading(line):
+            if is_heading(line, last_number):
                 # 遇到新标题：先把之前攒下的文字存成一个片段，再切换章节
                 if lines:
                     segments.append(Segment(section, page_number, join_lines(lines)))
                     lines = []
                 section = line
+                number = heading_number(line)
+                if number is not None:
+                    last_number = number
             else:
                 lines.append(line)
         # 一页结束：把这一页剩下的文字存成一个片段
